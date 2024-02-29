@@ -966,6 +966,9 @@ abstract class ScrollPosition extends ViewportOffset with ScrollMetrics {
   ScrollActivity? get activity => _activity;
   ScrollActivity? _activity;
 
+  /// Whether the current [ScrollActivity] is a ballistic scroll.
+  bool get isBallisticScrolling => activity is BallisticScrollActivity;
+
   /// Change the current [activity], disposing of the old one and
   /// sending scroll notifications as necessary.
   ///

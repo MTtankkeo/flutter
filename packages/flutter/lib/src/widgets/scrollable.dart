@@ -716,6 +716,10 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin, R
     }
   }
 
+  bool _handleDownAccept() {
+    return _isScrollingDragDown ?? false;
+  }
+
   // GESTURE RECOGNITION AND POINTER IGNORING
 
   final GlobalKey<RawGestureDetectorState> _gestureDetectorKey = GlobalKey<RawGestureDetectorState>();
@@ -727,6 +731,9 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin, R
 
   bool? _lastCanDrag;
   Axis? _lastAxisDirection;
+
+  /// Whether the scrolling when the gesture drag down event.
+  bool? _isScrollingDragDown;
 
   @override
   @protected
@@ -745,7 +752,10 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin, R
         case Axis.vertical:
           _gestureRecognizers = <Type, GestureRecognizerFactory>{
             VerticalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<VerticalDragGestureRecognizer>(
-              () => VerticalDragGestureRecognizer(supportedDevices: _configuration.dragDevices),
+              () => VerticalDragGestureRecognizer(
+                supportedDevices: _configuration.dragDevices,
+                downAccept: _handleDownAccept,
+              ),
               (VerticalDragGestureRecognizer instance) {
                 instance
                   ..onDown = _handleDragDown
@@ -767,7 +777,10 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin, R
         case Axis.horizontal:
           _gestureRecognizers = <Type, GestureRecognizerFactory>{
             HorizontalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<HorizontalDragGestureRecognizer>(
-              () => HorizontalDragGestureRecognizer(supportedDevices: _configuration.dragDevices),
+              () => HorizontalDragGestureRecognizer(
+                supportedDevices: _configuration.dragDevices,
+                downAccept: _handleDownAccept,
+              ),
               (HorizontalDragGestureRecognizer instance) {
                 instance
                   ..onDown = _handleDragDown
@@ -814,6 +827,7 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin, R
   ScrollHoldController? _hold;
 
   void _handleDragDown(DragDownDetails details) {
+    _isScrollingDragDown = position.isBallisticScrolling;
     assert(_drag == null);
     assert(_hold == null);
     _hold = position.hold(_disposeHold);
