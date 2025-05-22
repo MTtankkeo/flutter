@@ -564,7 +564,11 @@ void main() {
     }
     await expectLater(
       find.byType(CustomScrollView),
-      matchesGoldenFile('overscroll_stretch.horizontal.rtl.png'),
+      matchesGoldenFile(
+        isImpeller
+            ? 'overscroll_stretch.horizontal.rtl.impeller.png'
+            : 'overscroll_stretch.horizontal.rtl.png',
+      ),
     );
   });
 
@@ -661,7 +665,14 @@ void main() {
     expect(find.text('Index 1'), findsOneWidget);
     expect(tester.getCenter(find.text('Index 1')).dy, greaterThan(0));
     // Image should not show the text overlapping the red area below the list.
-    await expectLater(find.byType(Column), matchesGoldenFile('overscroll_stretch.no_overflow.png'));
+    await expectLater(
+      find.byType(Column),
+      matchesGoldenFile(
+        isImpeller
+            ? 'overscroll_stretch.no_overflow.impeller.png'
+            : 'overscroll_stretch.no_overflow.png',
+      ),
+    );
 
     await gesture.up();
     await tester.pumpAndSettle();

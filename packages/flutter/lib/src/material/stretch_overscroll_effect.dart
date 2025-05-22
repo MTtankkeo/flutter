@@ -64,6 +64,13 @@ class _StretchOverscrollEffectState extends State<StretchOverscrollEffect> {
     } else {
       if (!_StretchOverscrollEffectShader._initCalled) {
         _StretchOverscrollEffectShader.initializeShader();
+        _StretchOverscrollEffectShader.addListener(() {
+          if (mounted) {
+            setState(() {
+              // Rebuilds the widget once the fragment shader is fully initialized.
+            });
+          }
+        });
       } else {
         _fragmentShader?.dispose();
         _fragmentShader = null;
@@ -113,6 +120,7 @@ class _StretchOverscrollEffectShader {
   static bool _initCalled = false;
   static bool _initialized = false;
   static ui.FragmentProgram? _program;
+  static final List<VoidCallback> _listeners = <VoidCallback>[];
 
   static void initializeShader() {
     if (!_initCalled) {
@@ -121,8 +129,21 @@ class _StretchOverscrollEffectShader {
       ) {
         _program = program;
         _initialized = true;
+        _notifyListeners();
+        _listeners.clear();
       });
       _initCalled = true;
+    }
+  }
+
+  static void addListener(VoidCallback listener) {
+    assert(!_listeners.contains(listener));
+    _listeners.add(listener);
+  }
+
+  static void _notifyListeners() {
+    for (final VoidCallback listener in _listeners) {
+      listener.call();
     }
   }
 }
