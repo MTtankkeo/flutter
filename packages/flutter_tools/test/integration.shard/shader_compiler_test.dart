@@ -34,44 +34,51 @@ void main() {
     );
   }
 
-  testUsingContext('impellerc .iplr output has correct permissions', () async {
-    if (globals.platform.isWindows) {
-      return;
-    }
+  void testUsingContextForShaderPermission(String shaderName) {
+    testUsingContext('impellerc .iplr output has correct permissions for $shaderName', () async {
+      if (globals.platform.isWindows) {
+        return;
+      }
 
-    final String flutterRoot = getFlutterRoot();
-    final String inkSparklePath = globals.fs.path.join(
-      flutterRoot,
-      'packages',
-      'flutter',
-      'lib',
-      'src',
-      'material',
-      'shaders',
-      'ink_sparkle.frag',
-    );
-    final Directory tmpDir = globals.fs.systemTempDirectory.createTempSync('shader_compiler_test.');
-    final String inkSparkleOutputPath = globals.fs.path.join(tmpDir.path, 'ink_sparkle.frag');
+      final String flutterRoot = getFlutterRoot();
+      final String shaderPath = globals.fs.path.join(
+        flutterRoot,
+        'packages',
+        'flutter',
+        'lib',
+        'src',
+        'material',
+        'shaders',
+        shaderName,
+      );
+      final Directory tmpDir = globals.fs.systemTempDirectory.createTempSync(
+        'shader_compiler_test.',
+      );
+      final String inkSparkleOutputPath = globals.fs.path.join(tmpDir.path, shaderName);
 
-    final ShaderCompiler shaderCompiler = ShaderCompiler(
-      processManager: globals.processManager,
-      logger: logger,
-      fileSystem: globals.fs,
-      artifacts: globals.artifacts!,
-    );
-    final bool compileResult = await shaderCompiler.compileShader(
-      input: globals.fs.file(inkSparklePath),
-      outputPath: inkSparkleOutputPath,
-      targetPlatform: TargetPlatform.tester,
-    );
-    final File resultFile = globals.fs.file(inkSparkleOutputPath);
+      final ShaderCompiler shaderCompiler = ShaderCompiler(
+        processManager: globals.processManager,
+        logger: logger,
+        fileSystem: globals.fs,
+        artifacts: globals.artifacts!,
+      );
+      final bool compileResult = await shaderCompiler.compileShader(
+        input: globals.fs.file(shaderPath),
+        outputPath: inkSparkleOutputPath,
+        targetPlatform: TargetPlatform.tester,
+      );
+      final File resultFile = globals.fs.file(inkSparkleOutputPath);
 
-    expect(compileResult, true);
-    expect(resultFile.existsSync(), true);
+      expect(compileResult, true);
+      expect(resultFile.existsSync(), true);
 
-    final int expectedMode = int.parse('644', radix: 8);
-    expect(resultFile.statSync().mode & expectedMode, equals(expectedMode));
-  });
+      final int expectedMode = int.parse('644', radix: 8);
+      expect(resultFile.statSync().mode & expectedMode, equals(expectedMode));
+    });
+  }
+
+  testUsingContextForShaderPermission('ink_sparkle.frag');
+  testUsingContextForShaderPermission('stretch_overscroll.frag');
 
   testUsingContext('Compilation error with in storage', () async {
     const String kShaderWithInput = '''

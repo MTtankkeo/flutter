@@ -832,6 +832,7 @@ void main() {
 /base/assets/flutter_assets/
 /base/assets/flutter_assets/shaders/
 /base/assets/flutter_assets/shaders/ink_sparkle.frag
+/base/assets/flutter_assets/shaders/stretch_overscroll.frag
 /base/assets/flutter_assets/packages/
 /base/assets/flutter_assets/packages/cupertino_icons/
 /base/assets/flutter_assets/packages/cupertino_icons/assets/

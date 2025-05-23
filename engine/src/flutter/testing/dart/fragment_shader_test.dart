@@ -280,6 +280,21 @@ void main() async {
     shader.dispose();
   });
 
+  test('FragmentShader The stretch_overscroll shader is accepted', () async {
+    if (impellerEnabled) {
+      print('Skipped for Impeller - https://github.com/flutter/flutter/issues/122823');
+      return;
+    }
+    final FragmentProgram program = await FragmentProgram.fromAsset('stretch_overscroll.frag.iplr');
+    final FragmentShader shader = program.fragmentShader();
+
+    await _imageByteDataFromShader(shader: shader);
+
+    // Testing that no exceptions are thrown. Tests that the stretch_overscroll shader
+    // produces the correct pixels are in the framework.
+    shader.dispose();
+  });
+
   test('FragmentShader Uniforms are sorted correctly', () async {
     final FragmentProgram program = await FragmentProgram.fromAsset('uniforms_sorted.frag.iplr');
 
