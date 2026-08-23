@@ -406,8 +406,6 @@ extern CFTimeInterval display_link_target;
     return;
   }
 
-  // This is needed otherwise frame gets skipped on touch begin / end. Go figure.
-  // Might also be placebo
   [self setNeedsDisplay];
 
   [CATransaction begin];
@@ -439,9 +437,16 @@ extern CFTimeInterval display_link_target;
     if ([NSThread isMainThread]) {
       [self presentOnMainThread:texture];
     } else {
-      // Core animation layers can only be updated on main thread.
+      [CATransaction begin];
+      [CATransaction setDisableActions:YES];
+      self.contents = texture.surface;
+      [CATransaction commit];
+      [CATransaction flush];
+
       dispatch_async(dispatch_get_main_queue(), ^{
-        [self presentOnMainThread:texture];
+        _displayLink.paused = NO;
+        _displayLinkPauseCountdown = 0;
+        _didSetContentsDuringThisDisplayLinkPeriod = YES;
       });
     }
   }
